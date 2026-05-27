@@ -1,0 +1,1773 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>江湖探案录 · 卷一：客栈血影</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700&display=swap');
+
+:root {
+  --bg-primary: #0a0c10;
+  --bg-secondary: #12151c;
+  --bg-card: #1a1e28;
+  --bg-card-hover: #222836;
+  --border-color: #2a3040;
+  --border-active: #4a6fa5;
+  --text-primary: #e8e6e3;
+  --text-secondary: #9aa0b0;
+  --text-muted: #606878;
+  --accent-gold: #d4a853;
+  --accent-red: #c0392b;
+  --accent-blue: #2980b9;
+  --accent-green: #27ae60;
+  --clue-tag-bg: rgba(212,168,83,0.15);
+  --clue-tag-text: #d4a853;
+  --shadow-glow: 0 0 20px rgba(212,168,83,0.1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Serif SC', serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  height: 100vh;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* ===== 顶部状态栏 ===== */
+.top-bar {
+  height: 44px;
+  background: linear-gradient(180deg, #161a24 0%, #0f1219 100%);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 24px;
+  font-size: 13px;
+  position: relative;
+  z-index: 100;
+}
+
+.top-bar .brand {
+  font-family: 'Ma Shan Zheng', cursive;
+  font-size: 20px;
+  color: var(--accent-gold);
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(212,168,83,0.3);
+}
+
+.top-bar .stat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+}
+
+.top-bar .stat .label { color: var(--text-muted); }
+.top-bar .stat .value { color: var(--text-primary); font-weight: 700; }
+
+.top-bar .case-status {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+.case-status.investigating { background: rgba(41,128,185,0.15); color: #5dade2; border: 1px solid rgba(41,128,185,0.3); }
+.case-status.solved { background: rgba(39,174,96,0.15); color: #58d68d; border: 1px solid rgba(39,174,96,0.3); }
+
+.top-bar .icon-btn {
+  width: 32px; height: 32px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+  font-size: 14px;
+}
+.top-bar .icon-btn:hover { border-color: var(--border-active); color: var(--text-primary); }
+
+/* ===== 主布局 ===== */
+.main-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr 320px;
+  height: calc(100vh - 44px);
+}
+
+/* ===== 左侧线索面板 ===== */
+.clue-panel {
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.clue-panel-header {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.clue-panel-header h3 {
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.clue-count {
+  background: var(--bg-card);
+  color: var(--accent-gold);
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.clue-search {
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border-color);
+  position: relative;
+}
+
+.clue-search input {
+  width: 100%;
+  padding: 7px 30px 7px 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.clue-search input:focus { border-color: var(--border-active); }
+.clue-search input::placeholder { color: var(--text-muted); }
+.clue-search .search-icon {
+  position: absolute;
+  right: 22px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.clue-tags-hint {
+  padding: 6px 14px;
+  font-size: 11px;
+  color: var(--accent-gold);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.clue-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.clue-list::-webkit-scrollbar { width: 4px; }
+.clue-list::-webkit-scrollbar-track { background: transparent; }
+.clue-list::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
+
+.clue-item {
+  padding: 10px 12px;
+  margin-bottom: 4px;
+  background: var(--bg-card);
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-size: 13px;
+  line-height: 1.5;
+  position: relative;
+}
+
+.clue-item:hover { background: var(--bg-card-hover); border-color: var(--border-color); }
+.clue-item.active { 
+  border-color: var(--accent-gold); 
+  background: rgba(212,168,83,0.08);
+  box-shadow: var(--shadow-glow);
+}
+.clue-item.new { animation: clueNewPulse 2s ease-out; }
+@keyframes clueNewPulse {
+  0% { background: rgba(212,168,83,0.25); }
+  100% { background: var(--bg-card); }
+}
+
+.clue-item .clue-name { font-weight: 600; color: var(--text-primary); }
+.clue-item .clue-desc { color: var(--text-secondary); font-size: 12px; margin-top: 2px; }
+.clue-item .clue-tag {
+  display: inline-block;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: var(--clue-tag-bg);
+  color: var(--clue-tag-text);
+  margin-top: 4px;
+}
+
+.clue-item .clue-tag.tag-person { background: rgba(192,57,43,0.15); color: #e74c3c; }
+.clue-item .clue-tag.tag-evidence { background: rgba(41,128,185,0.15); color: #3498db; }
+.clue-item .clue-tag.tag-location { background: rgba(39,174,96,0.15); color: #2ecc71; }
+.clue-item .clue-tag.tag-doc { background: rgba(155,89,182,0.15); color: #9b59b6; }
+
+/* ===== 中间主内容区 ===== */
+.main-content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.content-tabs {
+  display: flex;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0 16px;
+}
+
+.tab-btn {
+  padding: 12px 18px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tab-btn:hover { color: var(--text-primary); }
+.tab-btn.active { color: var(--accent-gold); }
+.tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 16px;
+  right: 16px;
+  height: 2px;
+  background: var(--accent-gold);
+  box-shadow: 0 0 8px rgba(212,168,83,0.4);
+}
+
+.tab-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+}
+
+.tab-content::-webkit-scrollbar { width: 6px; }
+.tab-content::-webkit-scrollbar-track { background: transparent; }
+.tab-content::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+
+/* 场景描述卡片 */
+.scene-card {
+  background: linear-gradient(135deg, rgba(26,30,40,0.95) 0%, rgba(18,21,28,0.95) 100%);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.scene-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent-gold), transparent);
+}
+
+.scene-card .scene-title {
+  font-family: 'Ma Shan Zheng', cursive;
+  font-size: 22px;
+  color: var(--accent-gold);
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+
+.scene-card .scene-text {
+  font-size: 14px;
+  line-height: 1.9;
+  color: var(--text-secondary);
+}
+
+.scene-card .scene-text .highlight {
+  color: var(--accent-gold);
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 1px dashed var(--accent-gold);
+}
+
+.scene-card .scene-text .interactive {
+  color: #5dade2;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+
+/* 录供问询 */
+.interrogation-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.interrogation-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.interrogation-avatar {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2c3e50, #1a252f);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Ma Shan Zheng', cursive;
+  font-size: 18px;
+  color: var(--accent-gold);
+  border: 2px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.interrogation-name {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.interrogation-role {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.interrogation-body {
+  padding: 14px 18px;
+}
+
+.dialog-bubble {
+  background: rgba(41,128,185,0.08);
+  border-left: 3px solid var(--accent-blue);
+  padding: 12px 16px;
+  border-radius: 0 6px 6px 0;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+
+.dialog-bubble.player {
+  background: rgba(212,168,83,0.08);
+  border-left: 3px solid var(--accent-gold);
+  border-radius: 0 6px 6px 0;
+}
+
+/* 行动选项 */
+.action-area {
+  padding: 16px 24px;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+}
+
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+}
+
+.action-btn {
+  padding: 11px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.action-btn:hover {
+  border-color: var(--accent-gold);
+  background: rgba(212,168,83,0.08);
+  transform: translateY(-1px);
+}
+.action-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+.action-btn .action-icon {
+  font-size: 16px;
+  width: 22px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* ===== 右侧面板 ===== */
+.right-panel {
+  background: var(--bg-secondary);
+  border-left: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.quest-card {
+  background: linear-gradient(135deg, rgba(192,57,43,0.15) 0%, rgba(192,57,43,0.05) 100%);
+  border: 1px solid rgba(192,57,43,0.3);
+  border-radius: 8px;
+  margin: 12px;
+  padding: 14px 16px;
+}
+
+.quest-card .quest-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #e74c3c;
+}
+
+.quest-card .quest-pid {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+.quest-card .quest-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.puzzle-section {
+  flex: 1;
+  padding: 12px;
+  overflow-y: auto;
+}
+
+.puzzle-section h4 {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.puzzle-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.puzzle-input {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  margin-bottom: 10px;
+}
+.puzzle-input:focus { border-color: var(--accent-blue); }
+
+.puzzle-submit {
+  width: 100%;
+  padding: 10px;
+  background: var(--accent-blue);
+  border: none;
+  border-radius: 4px;
+  color: white;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.puzzle-submit:hover { opacity: 0.85; }
+
+.puzzle-hint {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+/* 地图/位置面板 */
+.location-list {
+  padding: 8px 12px;
+}
+
+.location-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-size: 13px;
+}
+.location-item:hover { border-color: var(--accent-green); }
+.location-item.current { border-color: var(--accent-green); background: rgba(39,174,96,0.08); }
+.location-item .loc-icon { font-size: 16px; }
+.location-item .loc-name { flex: 1; }
+.location-item .loc-status { font-size: 11px; color: var(--text-muted); }
+
+/* ===== 推理结论弹窗 ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.modal-content {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 28px;
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.modal-title {
+  font-family: 'Ma Shan Zheng', cursive;
+  font-size: 26px;
+  color: var(--accent-gold);
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.modal-body {
+  font-size: 14px;
+  line-height: 1.9;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+.modal-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal-choice {
+  padding: 14px 18px;
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-size: 14px;
+  text-align: left;
+  color: var(--text-primary);
+  font-family: inherit;
+}
+.modal-choice:hover { border-color: var(--accent-gold); background: rgba(212,168,83,0.06); }
+
+.modal-close {
+  margin-top: 16px;
+  width: 100%;
+  padding: 12px;
+  background: var(--border-color);
+  border: none;
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* ===== 通知/提示 ===== */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-card);
+  border: 1px solid var(--accent-gold);
+  color: var(--accent-gold);
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  z-index: 2000;
+  animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+@keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+@keyframes toastOut { from { opacity: 1; } to { opacity: 0; } }
+
+/* ===== 隐藏 ===== */
+.hidden { display: none !important; }
+
+/* ===== 打字机效果 ===== */
+.typing-cursor::after {
+  content: '|';
+  animation: blink 1s infinite;
+  color: var(--accent-gold);
+}
+@keyframes blink { 0%,50% { opacity: 1; } 51%,100% { opacity: 0; } }
+
+/* ===== 分隔线 ===== */
+.divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 12px 0;
+}
+
+/* ==================== 移动端竖屏适配 ==================== */
+@media (max-width: 768px) {
+  body { font-size: 14px; }
+
+  /* 顶部栏精简 */
+  .top-bar {
+    height: 40px;
+    padding: 0 10px;
+    gap: 10px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+  .top-bar .brand { font-size: 16px; letter-spacing: 1px; flex-shrink: 0; }
+  .top-bar .stat { display: none; }
+  /* 只保留功勋和状态 */
+  .top-bar .stat:nth-of-type(1) { display: flex; font-size: 12px; }
+  .top-bar .stat:nth-of-type(1) .label { display: none; }
+  .top-bar .case-status { font-size: 11px; padding: 2px 8px; flex-shrink: 0; }
+  .top-bar .icon-btn { width: 28px; height: 28px; font-size: 13px; flex-shrink: 0; }
+
+  /* 三栏 → 单栏 + 底部Tab */
+  .main-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+    height: calc(100vh - 40px);
+  }
+
+  /* 左侧线索面板 → 作为底部Tab的一个页面 */
+  .clue-panel {
+    position: fixed;
+    inset: 40px 0 56px 0;
+    z-index: 50;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    border-right: none;
+  }
+  .clue-panel.mobile-show {
+    transform: translateX(0);
+  }
+
+  /* 右侧面板 → 同理 */
+  .right-panel {
+    position: fixed;
+    inset: 40px 0 56px 0;
+    z-index: 50;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    border-left: none;
+    overflow-y: auto;
+  }
+  .right-panel.mobile-show {
+    transform: translateX(0);
+  }
+
+  /* 中间内容区占满 */
+  .main-content {
+    min-height: 0;
+  }
+
+  /* 内容标签页文字缩小 */
+  .content-tabs {
+    padding: 0 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tab-btn {
+    padding: 10px 12px;
+    font-size: 12px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .tab-btn.active::after { left: 8px; right: 8px; }
+
+  .tab-content {
+    padding: 14px 14px;
+  }
+
+  /* 场景卡片 */
+  .scene-card { padding: 16px; }
+  .scene-card .scene-title { font-size: 18px; }
+  .scene-card .scene-text { font-size: 13px; line-height: 1.8; }
+
+  /* 行动按钮区 */
+  .action-area {
+    padding: 10px 12px;
+  }
+  .action-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 6px;
+  }
+  .action-btn {
+    padding: 12px 12px;
+    font-size: 13px;
+  }
+
+  /* 底部导航Tab（移动端独有） */
+  .mobile-nav {
+    display: flex !important;
+  }
+
+  /* 对话卡片 */
+  .interrogation-header { padding: 10px 14px; }
+  .interrogation-avatar { width: 36px; height: 36px; font-size: 15px; }
+  .interrogation-body { padding: 10px 14px; }
+  .dialog-bubble { padding: 10px 14px; font-size: 13px; }
+
+  /* 任务卡 */
+  .quest-card { margin: 8px; padding: 10px 12px; }
+
+  /* 谜题区 */
+  .puzzle-section { padding: 8px; }
+  .puzzle-box { padding: 12px; }
+
+  /* 地点列表 */
+  .location-item { padding: 8px 10px; font-size: 13px; }
+
+  /* 线索项 */
+  .clue-item { padding: 9px 10px; font-size: 13px; }
+
+  /* 弹窗 */
+  .modal-content {
+    width: 95%;
+    padding: 20px;
+    max-height: 85vh;
+  }
+  .modal-title { font-size: 22px; }
+
+  /* Toast */
+  .toast {
+    bottom: 70px;
+    font-size: 13px;
+    padding: 10px 18px;
+    left: 10px;
+    right: 10px;
+    transform: none;
+    text-align: center;
+  }
+}
+
+/* 底部导航（默认隐藏，移动端显示） */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  z-index: 100;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: center;
+  justify-content: space-around;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: var(--text-muted);
+  font-size: 10px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.15s;
+  user-select: none;
+  flex: 1;
+  height: 100%;
+  border: none;
+  background: none;
+  font-family: inherit;
+  padding: 0;
+}
+
+.mobile-nav-item.active,
+.mobile-nav-item:active {
+  color: var(--accent-gold);
+}
+
+.mobile-nav-item .nav-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+/* 移动端遮罩 */
+.mobile-overlay {
+  display: none;
+  position: fixed;
+  inset: 40px 0 56px 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 45;
+}
+.mobile-overlay.show { display: block; }
+</style>
+</head>
+<body>
+
+<!-- 顶部状态栏 -->
+<div class="top-bar">
+  <div class="brand">江湖探案录</div>
+  <div class="stat"><span class="label">探案功勋：</span><span class="value" id="score">0</span></div>
+  <div class="stat"><span class="label">案卷字号：</span><span class="value" id="caseId">提刑·景隆肆年·壹号</span></div>
+  <div class="stat"><span class="label">查案进度：</span></div>
+  <div class="case-status investigating" id="caseStatus">调查中</div>
+  <button class="icon-btn" onclick="showMap()" title="地图">🗺️</button>
+  <button class="icon-btn" onclick="saveGame()" title="存档">💾</button>
+  <button class="icon-btn" title="设置">⚙️</button>
+</div>
+
+<!-- 主布局 -->
+<div class="main-layout">
+
+<!-- 左侧：线索面板 -->
+<div class="clue-panel">
+  <div class="clue-panel-header">
+    <h3>🔍 线索 <span class="clue-count" id="clueCount">0</span></h3>
+    <button class="icon-btn" style="width:24px;height:24px;font-size:12px;" title="筛选">🏷️</button>
+  </div>
+  <div class="clue-search">
+    <input type="text" placeholder="输入线索..." id="clueSearchInput" oninput="filterClues()">
+    <span class="search-icon">🔎</span>
+  </div>
+  <div class="clue-tags-hint" id="tagsHint">核心线索已找齐 ✅</div>
+  <div class="clue-list" id="clueList">
+    <!-- 动态生成 -->
+  </div>
+</div>
+
+<!-- 中间：主内容区 -->
+<div class="main-content">
+  <!-- 标签页 -->
+  <div class="content-tabs">
+    <button class="tab-btn active" data-tab="scene" onclick="switchTab('scene')">📍 现场</button>
+    <button class="tab-btn" data-tab="investigation" onclick="switchTab('investigation')">🔎 验尸勘验</button>
+    <button class="tab-btn" data-tab="interrogation" onclick="switchTab('interrogation')">📝 录供问询</button>
+  </div>
+
+  <!-- 场景内容 -->
+  <div class="tab-content" id="tabScene">
+    <!-- 动态生成 -->
+  </div>
+
+  <!-- 调查内容（默认隐藏） -->
+  <div class="tab-content hidden" id="tabInvestigation"></div>
+
+  <!-- 录供问询（默认隐藏） -->
+  <div class="tab-content hidden" id="tabInterrogation"></div>
+
+  <!-- 行动选项区 -->
+  <div class="action-area" id="actionArea">
+    <div class="action-grid" id="actionGrid">
+      <!-- 动态生成 -->
+    </div>
+  </div>
+</div>
+
+<!-- 右侧：任务+解谜 -->
+<div class="right-panel">
+  <div class="quest-card" id="questCard">
+    <div class="quest-header">
+      <span>❓</span>
+      <span id="questTitle">找到最后的真相了吗？</span>
+      <span class="quest-pid" id="questPid">PID: ??????</span>
+    </div>
+    <div class="quest-text" id="questText">当前任务：彻查悦来客栈血案，缉拿真凶</div>
+  </div>
+
+  <div class="puzzle-section">
+    <h4>🔐 <span id="puzzleTitle">推演断案</span></h4>
+    <div class="puzzle-box" id="puzzleBox">
+      <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;" id="puzzleDesc">根据线索推演，输入你的判断</div>
+      <input type="text" class="puzzle-input" id="puzzleInput" placeholder="输入答案...">
+      <button class="puzzle-submit" onclick="submitPuzzle()">提交</button>
+      <div class="puzzle-hint" id="puzzleHint"></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  
+  <div style="padding:12px;">
+    <h4 style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">📍 前往地点</h4>
+    <div class="location-list" id="locationList">
+      <!-- 动态生成 -->
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- 移动端底部导航 -->
+<nav class="mobile-nav" id="mobileNav">
+  <button class="mobile-nav-item active" data-panel="main" onclick="switchMobilePanel('main')">
+    <span class="nav-icon">📜</span>
+    <span>现场</span>
+  </button>
+  <button class="mobile-nav-item" data-panel="clues" onclick="switchMobilePanel('clues')">
+    <span class="nav-icon">🔍</span>
+    <span>线索</span>
+  </button>
+  <button class="mobile-nav-item" data-panel="side" onclick="switchMobilePanel('side')">
+    <span class="nav-icon">📋</span>
+    <span>任务</span>
+  </button>
+  <button class="mobile-nav-item" data-panel="action" onclick="scrollToAction()">
+    <span class="nav-icon">🎯</span>
+    <span>行动</span>
+  </button>
+</nav>
+
+<!-- 移动端侧边面板遮罩 -->
+<div class="mobile-overlay" id="mobileOverlay" onclick="closeMobilePanels()"></div>
+
+<script>
+// ==================== 游戏数据 ====================
+
+const GAME = {
+  score: 0,
+  currentLocation: 'inn',
+  currentCase: 1,
+  caseStatus: 'investigating',
+  clues: [],
+  unlockedLocations: ['inn'],
+  flags: {},
+  puzzleActive: null
+};
+
+// 案件数据
+const CASES = {
+  1: {
+    id: '提刑·景隆肆年·壹号',
+    name: '卷一：客栈血影',
+    subtitle: '悦来客栈命案',
+    description: '大梁国边境小镇，悦来客栈突发命案。一位神秘客人在深夜被杀，死状诡异。你作为朝廷钦点的"提刑司"探员，奉命前往调查...',
+    locations: {
+      inn: { name: '悦来客栈', icon: '🏮', desc: '案发地点，一座位于官道旁的老字号客栈' },
+      corpse_room: { name: '203号房', icon: '🚪', desc: '死者所住房间，门从内部反锁' },
+      kitchen: { name: '后厨', icon: '🍳', desc: '客栈后厨，伙计们忙碌的地方' },
+      courtyard: { name: '天井院落', icon: '🌙', desc: '客栈中央的天井，夜间可见星空' },
+      street: { name: '镇上街道', icon: '🛤️', desc: '客栈外的官道，来往商旅必经之路' },
+      yamen: { name: '县衙', icon: '🏛️', desc: '本地县衙，可以查阅卷宗' }
+    },
+    characters: {
+      wang_po: { name: '王老板', role: '悦来客栈掌柜', avatar: '王', color: '#e74c3c' },
+      xiao_er: { name: '店小二', role: '客栈伙计', avatar: '小', color: '#3498db' },
+      liu_auntie: { name: '刘婶', role: '厨娘', avatar: '刘', color: '#e67e22' },
+      merchant_zhang: { name: '张商人', role: '住客·行商', avatar: '张', color: '#9b59b6' },
+      swordsman: { name: '青衣剑客', role: '住客·江湖人', avatar: '剑', color: '#1abc9c' },
+      corpse: { name: '死者', role: '身份不明', avatar: '?', color: '#7f8c8d' }
+    },
+    clues: [
+      { id: 'c1', name: '尸体状况', desc: '男性，约三十岁，身着深色劲装。致命伤为胸口一刀，伤口极细，非普通兵刃所致。死亡时间约为子时前后（23:00-01:00）。', tag: 'evidence', tagLabel: '证物' },
+      { id: 'c2', name: '反锁的房门', desc: '203号房的门从内部用门栓拴住，窗户紧闭且完好无损。但现场没有发现任何暗道或机关。', tag: 'evidence', tagLabel: '证物' },
+      { id: 'c3', name: '死者随身物品', desc: '腰间无兵器，仅有一块刻有"云"字的玉佩、一封未拆封的信函、若干散碎银两。信函上写着"交云兄亲启"。', tag: 'evidence', tagLabel: '证物' },
+      { id: 'c4', name: '王老板证词', desc: '"这位客官是三天前入住的，登记名字叫李云。说是来这边做药材生意的，每天早出晚归，话不多。"', tag: 'person', tagLabel: '人物' },
+      { id: 'c5', name: '店小二证词', desc: '"子时左右我听见楼上好像有动静，但以为是客人翻身就没在意。后来……后来天亮才发现出事了！"', tag: 'person', tagLabel: '人物' },
+      { id: 'c6', name: '刘婶证词', desc: '"那天晚上我在厨房熬粥，大概亥时末（21点多）看见一个人影从后院翻墙出去了。穿着深色衣服，身形挺瘦的。"', tag: 'person', tagLabel: '人物' },
+      { id: 'c7', name: '张商人证词', desc: '"我和那位李客官在院子里聊过天。他说他是从京城来的，对这一带不太熟。看起来不像做药材买卖的，倒像是……练家子。"', tag: 'person', tagLabel: '人物' },
+      { id: 'c8', name: '青衣剑客证词', desc: '"（冷笑）那人的步法是军中训练出来的，不是什么药材商。而且他腰间的玉佩——那是北境军中的信物。"', tag: 'person', tagLabel: '人物' },
+      { id: 'c9', name: '密信内容', desc: '拆开死者身上的信函，上面写道："事已备妥，三日后子时悦来客栈交接。切记勿带随从。——K"。落款只有一个字母"K"。', tag: 'doc', tagLabel: '文书' },
+      { id: 'c10', name: '墙外脚印', desc: '客栈后墙外的泥地上发现几枚脚印，鞋底纹路特殊——是官靴。方向朝向镇外。', tag: 'evidence', tagLabel: '证物' },
+      { id: 'c11', name: '县衙卷宗', desc: '近三个月内，周边地区已发生三起类似命案：死者均为中年男性，胸口细长刀伤，身份不明或使用假名。均被定性为"江湖仇杀"。', tag: 'doc', tagLabel: '文书' },
+      { id: 'c12', name: '玉佩的秘密', desc: '这块玉佩上的"云"字刻法特殊，是北境边军的暗记。北境军近年因粮饷问题屡有异动……', tag: 'evidence', tagLabel: '证物' }
+    ],
+    scenes: {
+      inn_opening: {
+        title: '序章：风雨欲来',
+        text: `<p>大梁国<span class="highlight">景隆四年</span>，秋。</p>
+        <p>你策马疾驰了三日，终于在这座名为"清风镇"的小城停下脚步。</p>
+        <p>三日前，一封加急密报送至提刑司——<span class="highlight">悦来客栈发生命案</span>，死者身份蹊跷，地方县令请求派专人彻查。</p>
+        <p>作为提刑司最年轻的提刑官，你接下了这个案子。</p>
+        <p>此刻，你站在悦来客栈门前。招牌上的"悦来"二字在秋风中微微摇晃，客栈里透出昏黄的烛光。</p>
+        <p>空气中弥漫着一股淡淡的<span class="interactive" onclick="addClue('c1')">血腥气</span>……</p>`,
+        actions: [
+          { text: '进入客栈大厅', icon: '🚪', action: 'go_inn_hall' },
+          { text: '先观察周围环境', icon: '👁️', action: 'look_around' }
+        ]
+      },
+      look_around: {
+        title: '观察周围',
+        text: `<p>你在客栈外仔细观察了一番。</p>
+        <p>这是一座两层木楼，外墙有些年头了。<span class="highlight">后院有一堵高墙</span>，墙外是一片荒地，杂草丛生。</p>
+        <p>正门两侧挂着红灯笼，但右侧那个已经熄灭了。</p>
+        <p>客栈旁边的巷子里似乎有什么<span class="interactive" onclick="addClue('c10')">痕迹</span>……</p>
+        <p>远处传来更夫打更的声音："天干物燥，小心火烛——"</p>`,
+        actions: [
+          { text: '进入客栈', icon: '🚪', action: 'go_inn_hall' },
+          { text: '去后墙查看', icon: '🧱', action: 'check_back_wall' }
+        ]
+      },
+      go_inn_hall: {
+        title: '客栈大厅',
+        text: `<p>推开厚重的木门，一股混合着酒气和陈旧木头的味道扑面而来。</p>
+        <p>大厅里光线昏暗，几张桌子零散摆放着。柜台后面站着一个<span class="interactive" onclick="talkTo('wang_po')">中年胖子</span>，脸色苍白，眼神闪烁。</p>
+        <p>一个<span class="interactive" onclick="talkTo('xiao_er')">年轻伙计</span>正在擦拭一张空桌子，手有些发抖。</p>
+        <p>角落里坐着两个人——一个<span class="interactive" onclick="talkTo('merchant_zhang')">穿绸缎的中年人</span>正在喝茶，另一个<span class="interactive" onclick="talkTo('swordsman')">青衣剑客</span>靠窗而坐，目光锐利地扫了你一眼。</p>
+        <p>楼梯通向二楼，那里就是<span class="interactive" onclick="goLocation('corpse_room')">案发的203号房</span>。</p>`,
+        actions: [
+          { text: '与王老板交谈', icon: '🗣️', action: 'talk_wang' },
+          { text: '上楼查看案发现场', icon: '⬆️', action: 'go_corpse_room' },
+          { text: '去后厨看看', icon: '🍳', action: 'go_kitchen' },
+          { text: '到院子转转', icon: '🌙', action: 'go_courtyard' }
+        ]
+      },
+      corpse_room: {
+        title: '203号房 · 案发现场',
+        text: `<p>房间不大，但收拾得还算整洁——至少在案发前是这样。</p>
+        <p>尸体已经被移走，但地上还能看到<span class="highlight">暗红色的血迹</span>，已经渗入木板深处。</p>
+        <p>床铺凌乱，枕头上有挣扎的痕迹。<span class="interactive" onclick="addClue('c2')">房门确实是从里面反锁的</span>——你亲自检查了门栓。</p>
+        <p>窗户是老式的雕花木窗，紧紧关闭着。窗台上积了一层薄灰，<span class="highlight">没有任何被撬动的痕迹</span>。</p>
+        <p>死者的行李还在角落里——一个灰色布包。里面的东西已经被官差登记带走，但你应该可以去<span class="interactive" onclick="goLocation('yamen')">县衙</span>查看清单。</p>`,
+        actions: [
+          { text: '仔细搜索房间', icon: '🔍', action: 'search_room' },
+          { text: '返回大厅', icon: '⬇️', action: 'go_inn_hall' },
+          { text: '去县衙查证物', icon: '🏛️', action: 'go_yamen' }
+        ]
+      },
+      search_room: {
+        title: '搜查房间',
+        text: `<p>你蹲下身，开始仔细搜查每一个角落。</p>
+        <p>床底下——除了灰尘什么都没有。</p>
+        <p>衣柜里——几件换洗衣服，都是普通的粗布衣裳。</p>
+        <p>然后在床垫和床板之间的缝隙里，你摸到了一样东西——</p>
+        <p><span class="highlight">一块玉佩</span>，上面刻着一个"云"字。还有一封<span class="interactive" onclick="addClue('c9')">未拆封的信</span>。</p>
+        <p>奇怪，官差的验尸报告里并没有提到这些东西……是他们漏检了，还是有人故意留下的？</p>`,
+        actions: [
+          { text: '检查玉佩', icon: '💎', action: 'examine_jade' },
+          { text: '拆阅信件', icon: '✉️', action: 'read_letter' },
+          { text: '继续搜查其他地方', icon: '🔍', action: 'search_room_done' }
+        ]
+      },
+      kitchen: {
+        title: '后厨',
+        text: `<p>穿过一条狭窄的走廊，你来到客栈后厨。</p>
+        <p>灶台上的大锅还冒着热气，空气中飘着米粥的香味。</p>
+        <p>一个<span class="interactive" onclick="talkTo('liu_auntie')">中年妇人</span>正在搅动锅里的粥，听到脚步声回过头来，手上还拿着汤勺。</p>
+        <p>"哎哟，大人您是……哦，来查案的吧。"她擦了擦手，神色有些紧张。</p>
+        <p>后厨有一扇小门通往后院，门虚掩着。透过门缝能看到外面的高墙和荒地。</p>`,
+        actions: [
+          { text: '与刘婶交谈', icon: '🗣️', action: 'talk_liu' },
+          { text: '去后院查看', icon: '🌿', action: 'go_backyard' },
+          { text: '返回大厅', icon: '⬅️', action: 'go_inn_hall' }
+        ]
+      },
+      courtyard: {
+        title: '天井院落',
+        text: `<p>客栈中央是一个方形的天井，四面围廊，头顶是一方夜空。</p>
+        <p>虽然已是秋天，但院角的一株老桂树还开着花，香气若有若无。</p>
+        <p>天井中央有一口小水井，井栏上刻着"饮水思源"四个字。</p>
+        <p>你在井边蹲下，发现泥土有些<span class="highlight">新翻动的痕迹</span>——就在井栏后方，被桂树的阴影遮住了。</p>
+        <p>二楼走廊的栏杆上似乎也有什么东西……</p>`,
+        actions: [
+          { text: '检查翻动的泥土', icon: '🕳️', action: 'check_dirt' },
+          { text: '上二楼走廊查看', icon: '⬆️', action: 'check_corridor' },
+          { text: '返回大厅', icon: '⬅️', action: 'go_inn_hall' }
+        ]
+      },
+      yamen: {
+        title: '县衙 · 卷宗室',
+        text: `<p>县衙不大，但还算整洁。县令是个五十多岁的老头，见到你的公文后连连作揖。</p>
+        <p>"下官失职！此案蹊跷万分，实在超出了下官的能力范围……"</p>
+        <p>你让他退下，独自翻阅起桌上的卷宗。</p>
+        <p><span class="interactive" onclick="addClue('c11')">近三月同类命案记录</span>引起了你的注意——这已经不是第一起了。</p>
+        <p>另外，死者身上被扣押的物品清单也在这里：<span class="interactive" onclick="addClue('c3')">深色劲装、散碎银两、以及登记时用的"李云"这个假名</span>。</p>
+        <p>但清单上没有提到玉佩和信件……</p>`,
+        actions: [
+          { text: '要求重新检验尸体', icon: '🔬', action: 're_examine' },
+          { text: '返回客栈', icon: '🏮', action: 'go_inn_hall' },
+          { text: '整理所有线索进行推理', icon: '🧠', action: 'start_deduction' }
+        ]
+      },
+      deduction_ready: {
+        title: '推理时刻',
+        text: `<p>你已经收集到了足够的线索。是时候整理思路了。</p>
+        <p>让我们梳理一下已知的事实：</p>
+        <p>① 死者<span class="highlight">不是普通药材商</span>，而是北境军人（玉佩为证）</p>
+        <p>② 他来此地是为了与代号"<span class="highlight">K</span>"的人交接某样东西（密信为证）</p>
+        <p>③ 房间<span class="highlight">从内部反锁</span>，门窗完好——凶手是如何进出？</p>
+        <p>④ 刘婶看到有人<span class="highlight">翻墙离开</span>，墙外有官靴脚印</p>
+        <p>⑤ 近期已有<span class="highlight">三起类似命案</span>，均为"江湖仇杀"结案</p>
+        <p>⑥ 青衣剑客认出了死者的身份……但他自己又是什么人？</p>
+        <p><span class="highlight interactive" onclick="showDeductionModal()">→ 点击开始最终推理 →</span></p>`,
+        actions: [
+          { text: '开始推理指认凶手', icon: '🧠', action: 'start_deduction' },
+          { text: '还有线索没收集完', icon: '🔍', action: 'go_inn_hall' }
+        ]
+      }
+    },
+    puzzles: {
+      final_deduction: {
+        title: '最终推理',
+        desc: '根据所有线索，谁是真正的凶手？请输入你认为的凶手代号/名字。',
+        answer: '剑客',
+        hints: [
+          '想想谁最了解死者的真实身份？',
+          '谁有能力制造"密室"？',
+          '青衣剑客说死者的步法是军中训练——他自己呢？'
+        ],
+        onSuccess: 'showCase1Ending'
+      }
+    },
+    ending: {
+      title: '卷一终章：真相',
+      text: `<p style="text-align:center;font-size:18px;color:var(--accent-gold);margin-bottom:16px;">━━━ 真 相 ━━━</p>
+      <p>真正的凶手，是那位<span class="highlight">青衣剑客</span>。</p>
+      <p>他的真名无人知晓，只知道他在江湖上被称为"无影刃"——一个专门替人消灾的刺客。</p>
+      <p>整个案件的经过是这样的：</p>
+      <p><span class="highlight">死者"李云"</span>确实是北境军中的人，他携带了一份重要的军需调拨文书（藏在玉佩夹层中），准备交给接头人"K"。</p>
+      <p>但有人提前获知了这个消息，雇佣了无影刃前来截杀。</p>
+      <p><span class="highlight">关于"密室"</span>：无影刃精通缩骨功和轻功中的"壁游术"，他能沿着外墙攀上二楼，从窗户缝隙中将细如发丝的软剑刺入室内杀人后再撤离。所谓的"反锁"从一开始就是个误导——凶手从未真正"进入"过房间。</p>
+      <p><span class="highlight">关于"K"</span>：信中的"K"并非一个人名，而是一个组织的代号——<span class="highlight">"乾卦"</span>。这是一个潜伏在朝堂与江湖之间的秘密组织，其真正目的……</p>
+      <p style="color:var(--accent-red);font-weight:700;">尚不明确。但你在玉佩夹层中发现的那份文书上，隐约提到了"起事"、"京畿"等字眼。</p>
+      <p style="text-align:center;margin-top:20px;color:var(--accent-gold);">━━━ 卷一 完 ━━━</p>
+      <p style="text-align:center;color:var(--text-muted);font-size:13px;">更多案件，即将展开……</p>`
+    }
+  }
+};
+
+// ==================== 游戏状态管理 ====================
+
+let currentScene = 'inn_opening';
+let currentTab = 'scene';
+
+function initGame() {
+  renderClues();
+  renderScene(currentScene);
+  renderActions(CASES[1].scenes[currentScene].actions);
+  renderLocations();
+  updateStats();
+  
+  // 初始解锁部分线索
+  setTimeout(() => {
+    addClue('c1');
+  }, 1500);
+}
+
+// ==================== 线索系统 ====================
+
+function addClue(clueId) {
+  if (GAME.clues.includes(clueId)) return;
+  
+  const clueData = CASES[1].clues.find(c => c.id === clueId);
+  if (!clueData) return;
+  
+  GAME.clues.push(clueId);
+  GAME.score += 5;
+  updateStats();
+  renderClues();
+  
+  showToast(`🔍 新线索：${clueData.name}`);
+  
+  // 检查是否可以进入推理阶段
+  if (GAME.clues.length >= 6 && !GAME.flags.deductionUnlocked) {
+    GAME.flags.deductionUnlocked = true;
+    setTimeout(() => {
+      showToast('🧠 已收集足够线索，可以进行推理了！');
+    }, 1000);
+  }
+}
+
+function renderClues() {
+  const list = document.getElementById('clueList');
+  const search = document.getElementById('clueSearchInput').value.toLowerCase();
+  
+  const filteredClues = CASES[1].clues.filter(c => {
+    if (!GAME.clues.includes(c.id)) return false;
+    if (search && !c.name.toLowerCase().includes(search) && !c.desc.toLowerCase().includes(search)) return false;
+    return true;
+  });
+  
+  list.innerHTML = filteredClues.map(c => `
+    <div class="clue-item new" onclick="showClueDetail('${c.id}')">
+      <div class="clue-name">${c.name}</div>
+      <div class="clue-desc">${c.desc.substring(0, 40)}...</div>
+      <span class="clue-tag tag-${c.tag}">${c.tagLabel}</span>
+    </div>
+  `).join('');
+  
+  document.getElementById('clueCount').textContent = GAME.clues.length;
+  
+  // 更新标签提示
+  const hint = document.getElementById('tagsHint');
+  if (GAME.clues.length >= 8) {
+    hint.textContent = '核心线索已找齐 ✅';
+    hint.style.color = 'var(--accent-green)';
+  } else if (GAME.clues.length >= 4) {
+    hint.textContent = `还需 ${8 - GAME.clues.length} 条核心线索`;
+    hint.style.color = 'var(--accent-gold)';
+  } else {
+    hint.textContent = `还需 ${8 - GAME.clues.length} 条核心线索`;
+    hint.style.color = 'var(--accent-gold)';
+  }
+}
+
+function filterClues() { renderClues(); }
+
+function showClueDetail(clueId) {
+  const clue = CASES[1].clues.find(c => c.id === clueId);
+  if (!clue) return;
+  
+  // 高亮选中
+  document.querySelectorAll('.clue-item').forEach(el => el.classList.remove('active'));
+  if (event && event.currentTarget) event.currentTarget.classList.add('active');
+  
+  // 在右侧显示详情
+  document.getElementById('puzzleTitle').textContent = `📋 ${clue.name}`;
+  document.getElementById('puzzleBox').innerHTML = `
+    <div style="font-size:13px;line-height:1.8;color:var(--text-secondary);">${clue.desc}</div>
+    <div style="margin-top:12px;">
+      <span class="clue-tag tag-${clue.tag}">${clue.tagLabel}</span>
+    </div>
+  `;
+  
+  // 移动端：自动切换到右侧面板查看详情
+  if (isMobile()) {
+    switchMobilePanel('side');
+  }
+}
+
+// ==================== 场景渲染 ====================
+
+function renderScene(sceneKey) {
+  const scene = CASES[1].scenes[sceneKey];
+  if (!scene) return;
+  
+  currentScene = sceneKey;
+  const container = document.getElementById('tabScene');
+  container.innerHTML = `
+    <div class="scene-card">
+      <div class="scene-title">${scene.title}</div>
+      <div class="scene-text typing-cursor">${scene.text}</div>
+    </div>
+  `;
+  
+  // 移除打字光标效果
+  setTimeout(() => {
+    const el = container.querySelector('.typing-cursor');
+    if (el) el.classList.remove('typing-cursor');
+  }, 3000);
+}
+
+function renderActions(actions) {
+  const grid = document.getElementById('actionGrid');
+  grid.innerHTML = actions.map(a => `
+    <button class="action-btn" onclick="doAction('${a.action}')">
+      <span class="action-icon">${a.icon}</span>
+      <span>${a.text}</span>
+    </button>
+  `).join('');
+}
+
+// ==================== 行动处理 ====================
+
+function doAction(action) {
+  switch(action) {
+    case 'go_inn_hall':
+      renderScene('go_inn_hall');
+      renderActions(CASES[1].scenes.go_inn_hall.actions);
+      goLocation('inn');
+      break;
+      
+    case 'look_around':
+      renderScene('look_around');
+      renderActions(CASES[1].scenes.look_around.actions);
+      break;
+      
+    case 'go_corpse_room':
+      renderScene('corpse_room');
+      renderActions(CASES[1].scenes.corpse_room.actions);
+      goLocation('corpse_room');
+      addClue('c1');
+      break;
+      
+    case 'search_room':
+      renderScene('search_room');
+      renderActions(CASES[1].scenes.search_room.actions);
+      break;
+      
+    case 'examine_jade':
+      addClue('c12');
+      showToast('💎 你仔细端详这块玉佩——上面的"云"字刻法很不寻常...');
+      renderScene('search_room');
+      renderActions(CASES[1].scenes.search_room.actions);
+      break;
+      
+    case 'read_letter':
+      addClue('c9');
+      showToast('✉️ 信的内容让你心头一震……');
+      renderScene('search_room');
+      renderActions(CASES[1].scenes.search_room.actions);
+      break;
+      
+    case 'search_room_done':
+      renderScene('corpse_room');
+      renderActions(CASES[1].scenes.corpse_room.actions);
+      break;
+      
+    case 'go_kitchen':
+      renderScene('kitchen');
+      renderActions(CASES[1].scenes.kitchen.actions);
+      goLocation('kitchen');
+      break;
+      
+    case 'go_courtyard':
+      renderScene('courtyard');
+      renderActions(CASES[1].scenes.courtyard.actions);
+      goLocation('courtyard');
+      break;
+      
+    case 'go_yamen':
+      renderScene('yamen');
+      renderActions(CASES[1].scenes.yamen.actions);
+      goLocation('yamen');
+      unlockLocation('street');
+      break;
+      
+    case 'go_backyard':
+      addClue('c10');
+      showToast('👣 你在后墙外发现了可疑的脚印！');
+      renderScene('kitchen');
+      renderActions(CASES[1].scenes.kitchen.actions);
+      break;
+      
+    case 'check_back_wall':
+      addClue('c10');
+      showToast('👣 泥地上有几枚清晰的脚印，纹路很特别……');
+      renderScene('look_around');
+      renderActions(CASES[1].scenes.look_around.actions);
+      break;
+      
+    case 'check_dirt':
+      showToast('🕳️ 泥土中被埋着一块布片——深色的，似乎是衣服上撕下来的。');
+      addClue('c2');
+      renderScene('courtyard');
+      renderActions(CASES[1].scenes.courtyard.actions);
+      break;
+      
+    case 'check_corridor':
+      showToast('👀 二楼栏杆外侧有细微的抓痕……有人从这里攀爬过？');
+      addClue('c2');
+      renderScene('courtyard');
+      renderActions(CASES[1].scenes.courtyard.actions);
+      break;
+      
+    case 're_examine':
+      addClue('c3');
+      showToast('🔬 作作的补充验尸报告：死者胸口的伤口极细，宽度不超过两指，深度却足以致命。这种伤口……需要特殊的兵器。');
+      renderScene('yamen');
+      renderActions(CASES[1].scenes.yamen.actions);
+      break;
+      
+    case 'start_deduction':
+      if (GAME.clues.length < 6) {
+        showToast('⚠️ 线索不足！至少需要收集6条线索才能进行推理。');
+        return;
+      }
+      renderScene('deduction_ready');
+      renderActions(CASES[1].scenes.deduction_ready.actions);
+      // 设置谜题
+      GAME.puzzleActive = 'final_deduction';
+      document.getElementById('puzzleTitle').textContent = '🧠 最终推理';
+      document.getElementById('puzzleDesc').textContent = CASES[1].puzzles.final_deduction.desc;
+      document.getElementById('puzzleInput').placeholder = '输入凶手名字...';
+      document.getElementById('puzzleHint').innerHTML = '';
+      break;
+      
+    case 'talk_wang':
+      talkTo('wang_po');
+      break;
+    case 'talk_liu':
+      talkTo('liu_auntie');
+      break;
+      
+    default:
+      console.log('Unknown action:', action);
+  }
+}
+
+// ==================== 对话系统 ====================
+
+function talkTo(charId) {
+  const char = CASES[1].characters[charId];
+  if (!char) return;
+  
+  // 根据角色添加对应线索
+  const clueMap = {
+    'wang_po': 'c4',
+    'xiao_er': 'c5',
+    'liu_auntie': 'c6',
+    'merchant_zhang': 'c7',
+    'swordsman': 'c8'
+  };
+  
+  if (clueMap[charId]) {
+    addClue(clueMap[charId]);
+  }
+  
+  // 显示对话内容
+  const dialogTexts = {
+    'wang_po': '这位客官是三天前入住的，登记名字叫李云。说是来这边做药材生意的，每天早出晚归，话不多。付账用的是银子，出手挺大方……唉，谁知道会出这种事啊！我这个小店以后还怎么开啊……',
+    'xiao_er': '子时左右我听见楼上好像有动静，但以为是客人翻身就没在意。后来……后来天亮的时候，客人没下来吃早饭，我去敲门没人应，推门一看……哎呀妈呀，吓死我了！',
+    'liu_auntie': '那天晚上我在厨房熬粥，大概亥时末吧，二十一点多？我看见一个人影从后院翻墙出去了。穿着深色衣服，身形挺瘦的，动作很快，嗖一下就没了。我当时以为是谁偷溜出去方便呢……',
+    'merchant_zhang': '我和那位李客官在院子里聊过天。他说他是从京城来的，对这一带不太熟。但我看他走路的样子、说话的语气……不像做药材买卖的，倒像是练家子。对了，他还问了我一些奇怪的问题，比如镇上有多少兵马之类的。',
+    'swordsman': '（目光微动，上下打量了你一番）那人的步法是军中训练出来的，不是什么药材商。而且他腰间的玉佩——那是北境军中的信物。（顿了顿）你又是何人？提刑司的？（轻哼）希望你的本事比地方那些糊涂官强些。'
+  };
+  
+  // 切换到录供问询标签
+  switchTab('interrogation');
+  
+  // 移动端：自动回到主面板
+  if (isMobile()) {
+    closeMobilePanels();
+  }
+  
+  const container = document.getElementById('tabInterrogation');
+  const newCard = document.createElement('div');
+  newCard.className = 'interrogation-card';
+  newCard.innerHTML = `
+    <div class="interrogation-header">
+      <div class="interrogation-avatar" style="border-color:${char.color};color:${char.color}">${char.avatar}</div>
+      <div>
+        <div class="interrogation-name">${char.name}</div>
+        <div class="interrogation-role">${char.role}</div>
+      </div>
+    </div>
+    <div class="interrogation-body">
+      <div class="dialog-bubble">${dialogTexts[charId]}</div>
+    </div>
+  `;
+  container.appendChild(newCard);
+  
+  showToast(`📝 记录了${char.name}的证词`);
+}
+
+// ==================== 地点系统 ====================
+
+function goLocation(locKey) {
+  GAME.currentLocation = locKey;
+  renderLocations();
+}
+
+function unlockLocation(locKey) {
+  if (!GAME.unlockedLocations.includes(locKey)) {
+    GAME.unlockedLocations.push(locKey);
+    renderLocations();
+    showToast(`📍 解锁新地点：${CASES[1].locations[locKey]?.name || locKey}`);
+  }
+}
+
+function renderLocations() {
+  const list = document.getElementById('locationList');
+  list.innerHTML = Object.entries(CASES[1].locations).map(([key, loc]) => {
+    const unlocked = GAME.unlockedLocations.includes(key);
+    const isCurrent = GAME.currentLocation === key;
+    return `
+      <div class="location-item ${isCurrent ? 'current' : ''}" 
+           onclick="${unlocked ? `goLocation('${key}')` : ''}"
+           style="${!unlocked ? 'opacity:0.4;cursor:not-allowed;' : ''}">
+        <span class="loc-icon">${unlocked ? loc.icon : '🔒'}</span>
+        <span class="loc-name">${unlocked ? loc.name : '???'}</span>
+        <span class="loc-status">${isCurrent ? '当前位置' : ''}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+function showMap() {
+  // 简单的地图展示
+  let mapHtml = '<div style="font-size:14px;line-height:2;"><p style="color:var(--accent-gold);margin-bottom:12px;">🗺️ 清风镇地图</p>';
+  Object.entries(CASES[1].locations).forEach(([key, loc]) => {
+    const unlocked = GAME.unlockedLocations.includes(key);
+    mapHtml += `<p>${unlocked ? loc.icon : '🔒'} ${unlocked ? loc.name : '（未探索）'}${unlocked ? ' — ' + loc.desc : ''}</p>`;
+  });
+  mapHtml += '</div>';
+  
+  showModal('地图', mapHtml, true);
+}
+
+// ==================== 标签切换 ====================
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === tab);
+  });
+  document.querySelectorAll('.tab-content').forEach(content => {
+    content.classList.add('hidden');
+  });
+  
+  const tabMap = { scene: 'tabScene', investigation: 'tabInvestigation', interrogation: 'tabInterrogation' };
+  document.getElementById(tabMap[tab]).classList.remove('hidden');
+}
+
+// ==================== 谜题系统 ====================
+
+function submitPuzzle() {
+  if (!GAME.puzzleActive) return;
+  
+  const puzzle = CASES[1].puzzles[GAME.puzzleActive];
+  const input = document.getElementById('puzzleInput').value.trim();
+  const hintEl = document.getElementById('puzzleHint');
+  
+  if (!input) {
+    hintEl.textContent = '请输入答案';
+    return;
+  }
+  
+  if (input === puzzle.answer || input.includes(puzzle.answer) || puzzle.answer.includes(input)) {
+    // 正确
+    hintEl.innerHTML = '<span style="color:var(--accent-green);">✅ 回答正确！</span>';
+    GAME.score += 20;
+    updateStats();
+    
+    setTimeout(() => {
+      if (puzzle.onSuccess === 'showCase1Ending') {
+        showCase1Ending();
+      }
+    }, 1000);
+  } else {
+    // 错误
+    GAME.flags.wrongAttempts = (GAME.flags.wrongAttempts || 0) + 1;
+    const hintIdx = Math.min(GAME.flags.wrongAttempts - 1, (puzzle.hints?.length || 0) - 1);
+    
+    if (puzzle.hints && hintIdx >= 0) {
+      hintEl.innerHTML = `<span style="color:var(--accent-red);">❌ 不对。提示：${puzzle.hints[hintIdx]}</span>`;
+    } else {
+      hintEl.innerHTML = '<span style="color:var(--accent-red);">❌ 不对，再想想...</span>';
+    }
+  }
+}
+
+// ==================== 结局 ====================
+
+function showDeductionModal() {
+  showModal('最终推理', `
+    <p>根据你收集的所有线索，请指出真凶：</p>
+    <div class="modal-choices">
+      <button class="modal-choice" onclick="accuse('wang_po')">王老板（客栈掌柜）</button>
+      <button class="modal-choice" onclick="accuse('swordsman')">青衣剑客</button>
+      <button class="modal-choice" onclick="accuse('merchant_zhang')">张商人</button>
+      <button class="modal-choice" onclick="accuse('liu_auntie')">刘婶（厨娘）</button>
+      <button class="modal-choice" onclick="accuse('unknown')">还有其他人（尚未现身）</button>
+    </div>
+  `, false);
+}
+
+function accuse(target) {
+  closeModal();
+  
+  if (target === 'swordsman') {
+    showCase1Ending();
+  } else {
+    showModal('推理失败', `
+      <p>你指控了<strong>${{wang_po:'王老板',swordsman:'青衣剑客',merchant_zhang:'张商人',liu_auntie:'刘婶',unknown:'未知人物'}[target]}</strong>……</p>
+      <p>但证据链并不完整。你遗漏了一些关键线索。</p>
+      <p style="color:var(--text-muted);margin-top:12px;">💡 提示：再仔细看看每条线索，特别注意"密室"的形成条件和目击证词之间的矛盾点。</p>
+      <button class="modal-close" onclick="closeModal()">继续调查</button>
+    `, false);
+  }
+}
+
+function showCase1Ending() {
+  closeModal();
+  
+  // 更新状态
+  GAME.caseStatus = 'solved';
+  document.getElementById('caseStatus').textContent = '已结案';
+  document.getElementById('caseStatus').className = 'case-status solved';
+  
+  // 显示结局
+  renderScene('_ending');
+  document.getElementById('tabScene').innerHTML = `
+    <div class="scene-card">
+      <div class="scene-title">${CASES[1].ending.title}</div>
+      <div class="scene-text">${CASES[1].ending.text}</div>
+    </div>
+  `;
+  
+  // 清空行动区
+  document.getElementById('actionGrid').innerHTML = `
+    <button class="action-btn" onclick="showToast('📖 更多案件，敬请期待...')">
+      <span class="action-icon">📖</span>
+      <span>后续案件开发中...</span>
+    </button>
+  `;
+  
+  // 更新任务卡
+  document.getElementById('questTitle').textContent = '✅ 案件已侦破';
+  document.getElementById('questPid').textContent = '已归档结案';
+  document.getElementById('questText').textContent = '真凶：青衣剑客（"无影刃"）。幕后组织"乾卦"浮出水面...';
+  
+  GAME.score += 50;
+  updateStats();
+  
+  showToast('🎉 恭喜！卷一「客栈血影」完结！');
+}
+
+// ==================== UI工具函数 ====================
+
+function updateStats() {
+  document.getElementById('score').textContent = GAME.score;
+}
+
+function showToast(msg) {
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+  
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  
+  setTimeout(() => toast.remove(), 3000);
+}
+
+function showModal(title, body, closable = true) {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'modalOverlay';
+  overlay.innerHTML = `
+    <div class="modal-content">
+      <div class="modal-title">${title}</div>
+      <div class="modal-body">${body}</div>
+      ${closable ? '<button class="modal-close" onclick="closeModal()">关闭</button>' : ''}
+    </div>
+  `;
+  overlay.onclick = (e) => { if (e.target === overlay) closeModal(); };
+  document.body.appendChild(overlay);
+}
+
+function closeModal() {
+  const modal = document.getElementById('modalOverlay');
+  if (modal) modal.remove();
+}
+
+function saveGame() {
+  const saveData = JSON.stringify(GAME);
+  localStorage.setItem('jianghu_detective_save', saveData);
+  showToast('💾 存档成功');
+}
+
+function loadGame() {
+  const data = localStorage.getItem('jianghu_detective_save');
+  if (data) {
+    Object.assign(GAME, JSON.parse(data));
+    return true;
+  }
+  return false;
+}
+
+// ==================== 移动端面板切换 ====================
+
+let mobileCurrentPanel = 'main';
+
+function switchMobilePanel(panel) {
+  const nav = document.getElementById('mobileNav');
+  const cluePanel = document.querySelector('.clue-panel');
+  const rightPanel = document.querySelector('.right-panel');
+  const overlay = document.getElementById('mobileOverlay');
+
+  // 更新导航高亮
+  nav.querySelectorAll('.mobile-nav-item').forEach(item => {
+    item.classList.toggle('active', item.dataset.panel === panel);
+  });
+
+  // 关闭所有侧面板
+  cluePanel.classList.remove('mobile-show');
+  rightPanel.classList.remove('mobile-show');
+  overlay.classList.remove('show');
+
+  if (panel === 'clues') {
+    cluePanel.classList.add('mobile-show');
+    overlay.classList.add('show');
+  } else if (panel === 'side') {
+    rightPanel.classList.add('mobile-show');
+    overlay.classList.add('show');
+  } else {
+    // main 或 action → 显示中间内容区
+    // 确保主内容可见（它本来就是可见的）
+  }
+
+  mobileCurrentPanel = panel;
+}
+
+function closeMobilePanels() {
+  switchMobilePanel('main');
+}
+
+function scrollToAction() {
+  // 切回主面板，然后滚动到行动区
+  switchMobilePanel('main');
+  setTimeout(() => {
+    const actionArea = document.getElementById('actionArea');
+    if (actionArea) {
+      actionArea.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      // 高亮提示一下
+      actionArea.style.boxShadow = '0 0 0 2px var(--accent-gold)';
+      setTimeout(() => { actionArea.style.boxShadow = ''; }, 800);
+    }
+  }, 100);
+}
+
+// 检测是否移动端
+function isMobile() {
+  return window.innerWidth <= 768;
+}
+
+// ==================== 启动 ====================
+window.onload = initGame;
+</script>
+</body>
+</html>
