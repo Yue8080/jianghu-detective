@@ -437,6 +437,7 @@ body {
 }
 
 .quest-card {
+  flex-shrink: 0;
   background: linear-gradient(135deg, rgba(192,57,43,0.15) 0%, rgba(192,57,43,0.05) 100%);
   border: 1px solid rgba(192,57,43,0.3);
   border-radius: 8px;
@@ -467,9 +468,9 @@ body {
 }
 
 .puzzle-section {
-  flex: 1;
-  padding: 12px;
-  overflow-y: auto;
+  flex-shrink: 0;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .puzzle-section h4 {
@@ -657,6 +658,150 @@ body {
   background: var(--border-color);
   margin: 12px 0;
 }
+
+/* ===== 新增工具栏 ===== */
+.tools-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+}
+
+.tool-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 7px 4px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 18px;
+  font-family: inherit;
+}
+.tool-btn .tool-label { font-size: 10px; color: var(--text-muted); font-family: inherit; }
+.tool-btn:hover { border-color: var(--border-active); color: var(--text-secondary); }
+.tool-btn.active { border-color: var(--accent-gold); color: var(--accent-gold); background: rgba(212,168,83,0.08); }
+.tool-btn.active .tool-label { color: var(--accent-gold); }
+
+
+/* 工具面板 */
+.tool-panels { flex: 1; overflow: hidden; min-height: 0; }
+.tool-panel { display: none; flex-direction: column; height: 100%; overflow: hidden; }
+.tool-panel.active { display: flex; }
+.tool-panel-title { padding: 8px 12px; font-size: 12px; color: var(--text-muted); font-weight: 700; border-bottom: 1px solid var(--border-color); background: var(--bg-secondary); flex-shrink: 0; }
+
+/* ===== 时间线面板 ===== */
+.timeline-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 12px;
+}
+.timeline-container::-webkit-scrollbar { width: 4px; }
+.timeline-container::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
+
+.timeline-empty, .relation-empty, .log-empty, .board-empty {
+  color: var(--text-muted);
+  font-size: 12px;
+  text-align: center;
+  padding: 30px 10px;
+  line-height: 1.8;
+}
+
+.timeline-item {
+  position: relative;
+  padding-left: 24px;
+  padding-bottom: 16px;
+  border-left: 2px solid var(--border-color);
+  margin-left: 8px;
+}
+.timeline-item:last-child { border-left: none; padding-bottom: 0; }
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -9px;
+  top: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--border-color);
+  background: var(--bg-card);
+}
+.timeline-item.tl-active::before { border-color: var(--accent-gold); background: var(--accent-gold); }
+.timeline-item.tl-done::before { border-color: var(--accent-green); background: var(--accent-green); }
+.timeline-item.tl-clue::before { border-color: var(--accent-blue); background: var(--accent-blue); }
+
+.tl-time { font-size: 10px; color: var(--text-muted); margin-bottom: 2px; font-family: monospace; }
+.tl-title { font-size: 13px; color: var(--text-primary); font-weight: 600; margin-bottom: 3px; }
+.tl-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+.tl-tag { display: inline-block; font-size: 10px; padding: 1px 5px; border-radius: 3px; margin-top: 4px; }
+.tl-tag.tag-location { background: rgba(39,174,96,0.15); color: #2ecc71; }
+.tl-tag.tag-clue { background: rgba(41,128,185,0.15); color: #3498db; }
+.tl-tag.tag-event { background: rgba(212,168,83,0.15); color: var(--accent-gold); }
+.tl-tag.tag-interrogation { background: rgba(192,57,43,0.15); color: #e74c3c; }
+
+
+/* ===== 人物关系图面板 ===== */
+.relation-graph {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+.relation-graph svg { width: 100%; height: 100%; }
+.rel-label { font-size: 11px; fill: var(--text-muted); font-family: inherit; text-anchor: middle; }
+.rel-center-hint { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+
+
+/* ===== 案件日志面板 ===== */
+.log-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 12px;
+}
+.log-container::-webkit-scrollbar { width: 4px; }
+.log-container::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
+
+.log-item { border-left: 2px solid var(--border-color); padding-left: 12px; margin-bottom: 12px; }
+.log-item:last-child { border-left: 2px solid var(--accent-gold); }
+.log-time { font-size: 10px; color: var(--text-muted); margin-bottom: 2px; }
+.log-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; }
+.log-text { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+.log-action { display: inline-block; font-size: 11px; color: var(--accent-gold); cursor: pointer; margin-top: 4px; }
+.log-action:hover { text-decoration: underline; }
+
+
+/* ===== 证据链面板 ===== */
+.board-container { flex: 1; overflow-y: auto; padding: 10px 12px; }
+.board-container::-webkit-scrollbar { width: 4px; }
+.board-container::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
+
+.board-section-title { font-size: 11px; color: var(--text-muted); font-weight: 700; margin-bottom: 8px; margin-top: 12px; text-transform: uppercase; letter-spacing: 1px; }
+.board-section-title:first-child { margin-top: 0; }
+
+.board-progress { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 12px; }
+.board-progress-bar { flex: 1; height: 6px; background: var(--bg-card); border-radius: 3px; overflow: hidden; }
+.board-progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-gold)); border-radius: 3px; transition: width 0.5s ease; width: 0%; }
+.board-progress-text { color: var(--accent-gold); white-space: nowrap; }
+
+.board-theorem { background: rgba(212,168,83,0.06); border: 1px solid rgba(212,168,83,0.2); border-radius: 6px; padding: 12px; margin-bottom: 12px; }
+.board-theorem-title { font-size: 12px; font-weight: 700; color: var(--accent-gold); margin-bottom: 6px; }
+.board-theorem-text { font-size: 12px; color: var(--text-secondary); line-height: 1.7; }
+
+.board-slots { display: flex; flex-direction: column; gap: 4px; margin-bottom: 16px; }
+.board-slot { padding: 8px 12px; background: var(--bg-card); border: 1px dashed var(--border-color); border-radius: 4px; font-size: 12px; color: var(--text-muted); min-height: 36px; display: flex; align-items: center; }
+.board-slot.filled { border-style: solid; border-color: var(--border-active); color: var(--text-primary); background: rgba(41,128,185,0.06); }
+.board-slot.locked { opacity: 0.4; }
+.board-slot-icon { margin-right: 8px; }
+.board-slot-check { color: var(--accent-green); margin-left: auto; }
+
+/* 谜题区域样式 */
+.puzzle-section { padding: 10px 12px; border-bottom: 1px solid var(--border-color); }
 
 /* ==================== 移动端竖屏适配 ==================== */
 @media (max-width: 768px) {
@@ -927,15 +1072,58 @@ body {
     <div class="quest-text" id="questText">当前任务：彻查悦来客栈血案，缉拿真凶</div>
   </div>
 
-  <div class="puzzle-section">
-    <h4>🔐 <span id="puzzleTitle">推演断案</span></h4>
-    <div class="puzzle-box" id="puzzleBox">
-      <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;" id="puzzleDesc">根据线索推演，输入你的判断</div>
-      <input type="text" class="puzzle-input" id="puzzleInput" placeholder="输入答案...">
-      <button class="puzzle-submit" onclick="submitPuzzle()">提交</button>
-      <div class="puzzle-hint" id="puzzleHint"></div>
+  <!-- 新增工具栏 -->
+  <div class="tools-bar" id="toolsBar">
+    <button class="tool-btn active" id="toolBtnTimeline" onclick="switchToolPanel('timeline')" title="时间线">
+      <span>📊</span><span class="tool-label">时间线</span>
+    </button>
+    <button class="tool-btn" id="toolBtnRelation" onclick="switchToolPanel('relation')" title="人物关系">
+      <span>🔗</span><span class="tool-label">关系</span>
+    </button>
+    <button class="tool-btn" id="toolBtnLog" onclick="switchToolPanel('log')" title="案件日志">
+      <span>📖</span><span class="tool-label">日志</span>
+    </button>
+    <button class="tool-btn" id="toolBtnBoard" onclick="switchToolPanel('board')" title="证据链">
+      <span>🧩</span><span class="tool-label">证据链</span>
+    </button>
+  </div>
+
+  <!-- 工具面板容器 -->
+  <div class="tool-panels" id="toolPanels">
+
+    <!-- 时间线面板 -->
+    <div class="tool-panel active" id="panelTimeline">
+      <div class="tool-panel-title">📊 案发时间线</div>
+      <div class="timeline-container" id="timelineContainer">
+        <div class="timeline-empty">尚未开始调查……</div>
+      </div>
+    </div>
+
+    <!-- 人物关系面板 -->
+    <div class="tool-panel" id="panelRelation">
+      <div class="tool-panel-title">🔗 人物关系图</div>
+      <div class="relation-graph" id="relationGraph">
+        <!-- 动态SVG绘制 -->
+      </div>
+    </div>
+
+    <!-- 案件日志面板 -->
+    <div class="tool-panel" id="panelLog">
+      <div class="tool-panel-title">📖 调查日志</div>
+      <div class="log-container" id="logContainer">
+        <div class="log-empty">你的调查足迹将记录在此……</div>
+      </div>
+    </div>
+
+    <!-- 证据链面板 -->
+    <div class="tool-panel" id="panelBoard">
+      <div class="tool-panel-title">🧩 证据链拼接</div>
+      <div class="board-container" id="boardContainer">
+        <div class="board-empty">收集足够线索后可解锁证据链拼图</div>
+      </div>
     </div>
   </div>
+
 
   <div class="divider"></div>
   
@@ -1766,8 +1954,170 @@ function isMobile() {
   return window.innerWidth <= 768;
 }
 
-// ==================== 启动 ====================
-window.onload = initGame;
+// ==================== 新增：调查日志系统 ====================
+const INVESTIGATION_LOG = [];
+function addLogEntry(title, text, type) {
+  INVESTIGATION_LOG.push({ time: new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'}), title, text, type });
+  renderLog();
+}
+function renderLog() {
+  var c = document.getElementById('logContainer');
+  if(!c) return;
+  if(INVESTIGATION_LOG.length===0){ c.innerHTML='<div class="log-empty">你的调查足迹将记录在此……</div>'; return; }
+  c.innerHTML=INVESTIGATION_LOG.map(function(e){ return '<div class="log-item"><div class="log-time">'+e.time+'</div><div class="log-title">'+e.title+'</div><div class="log-text">'+e.text+'</div></div>'; }).join('');
+  c.scrollTop=c.scrollHeight;
+}
+
+// ==================== 新增：时间线系统 ====================
+var TIMELINE_EVENTS=[
+  {time:'戌时（19:00）',title:'李云入住悦来客栈',desc:'死者用假名登记入住203号房，行李中藏有密函。',type:'event'},
+  {time:'亥时（21:00）',title:'刘婶看见黑影翻墙',desc:'后厨刘婶看见一人从后院翻墙而出，身形瘦削。',type:'clue'},
+  {time:'亥时末（22:00）',title:'住客间短暂交谈',desc:'张商人与死者在院中闲聊，后者显出军人步法。',type:'clue'},
+  {time:'子时（23:00）',title:'小二听见动静',desc:'店小二听见二楼有声响，以为是客人翻身，未加理会。',type:'clue'},
+  {time:'子时（23:00-01:00）',title:'死者遇害',desc:'致命一刀正中胸口，房门反锁，无其他入口。',type:'event'},
+  {time:'卯时（05:00）',title:'命案发现',desc:'王老板发现203号房门紧闭，喊人撞开后见尸体。',type:'event'},
+  {time:'卯时（06:00）',title:'官府介入',desc:'县令接报赶到，将现场封锁，定性为"江湖仇杀"。',type:'event'},
+  {time:'景隆肆年秋',title:'你抵达清风镇',desc:'提刑司派员彻查，案件重新启动调查。',type:'location'}
+];
+var CLUE_TO_TL={c6:1,c7:2,c5:3,c1:4};
+function renderTimeline(){
+  var c=document.getElementById('timelineContainer');
+  if(!c)return;
+  var ids=GAME.clues;
+  var allDone=ids.length>=8;
+  var typeMap={clue:'tag-clue',event:'tag-event',location:'tag-location'};
+  var lblMap={clue:'线索',event:'事件',location:'地点'};
+  c.innerHTML=TIMELINE_EVENTS.map(function(ev,i){
+    var cls='';
+    var tag=typeMap[ev.type]||'tag-event';
+    var lbl=lblMap[ev.type]||'事件';
+    Object.keys(CLUE_TO_TL).forEach(function(k){ if(ids.includes(k)&&CLUE_TO_TL[k]===i)cls='tl-clue'; });
+    if(allDone&&i<TIMELINE_EVENTS.length-1)cls='tl-done';
+    return '<div class="timeline-item '+cls+'"><div class="tl-time">'+ev.time+'</div><div class="tl-title">'+ev.title+'</div><div class="tl-desc">'+ev.desc+'</div><span class="tl-tag '+tag+'">'+lbl+'</span></div>';
+  }).join('');
+}
+
+// ==================== 新增：人物关系图 ====================
+function renderRelationGraph(){
+  var c=document.getElementById('relationGraph');
+  if(!c)return;
+  var ids=new Set(GAME.clues);
+  var chars=CASES[1].characters;
+  var W=280,H=320;
+  var pos={corpse:{x:W/2,y:55},wang_po:{x:50,y:155},xiao_er:{x:W-50,y:155},liu_auntie:{x:40,y:265},merchant_zhang:{x:W-40,y:265},swordsman:{x:W/2,y:265}};
+  var edges=[
+    {f:'corpse',t:'wang_po',l:'住店登记',col:'#606878'},
+    {f:'corpse',t:'xiao_er',l:'提供服务',col:'#606878'},
+    {f:'corpse',t:'liu_auntie',l:'深夜离去',col:'#2a3040'},
+    {f:'corpse',t:'merchant_zhang',l:'院中交谈',col:'#2a3040'},
+    {f:'corpse',t:'swordsman',l:'身份识破',col:'#2a3040'},
+    {f:'wang_po',t:'xiao_er',l:'雇佣',col:'#3498db'},
+    {f:'wang_po',t:'liu_auntie',l:'雇佣',col:'#3498db'},
+    {f:'merchant_zhang',t:'swordsman',l:'同住客栈',col:'#2ecc71'},
+    {f:'swordsman',t:'corpse',l:'刺杀',col:'#c0392b',crime:true}
+  ];
+  if(ids.has('c6'))edges[2].col='#e74c3c';
+  if(ids.has('c7'))edges[3].col='#e67e22';
+  if(ids.has('c8')){edges[4].col='#9b59b6';edges[8].col='#c0392b';}
+  var svg='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg">';
+  edges.forEach(function(e){
+    var p1=pos[e.f],p2=pos[e.t];
+    var isAct=e.col!=='#2a3040';
+    var dash=e.crime&&!ids.has('c8')?'5,3':'';
+    var op=e.crime&&!ids.has('c8')?'0.35':(isAct?'0.85':'0.5');
+    svg+='<line x1="'+p1.x+'" y1="'+p1.y+'" x2="'+p2.x+'" y2="'+p2.y+'" stroke="'+e.col+'" stroke-width="'+(e.crime&&ids.has('c8')?'3':'1.5')+'" stroke-dasharray="'+dash+'" opacity="'+op+'"/>';
+    svg+='<text x="'+(p1.x+p2.x)/2+'" y="'+(p1.y+p2.y)/2+'" class="rel-label" fill="'+e.col+'" opacity="'+op+'">'+e.l+'</text>';
+  });
+  Object.entries(pos).forEach(function(a){
+    var key=a[0],p=a[1];var ch=chars[key];if(!ch)return;
+    svg+='<g class="rel-node"><circle cx="'+p.x+'" cy="'+p.y+'" r="22" fill="'+ch.color+'" opacity="0.85" stroke="#e8e6e3" stroke-width="1.5"/><text x="'+p.x+'" y="'+(p.y+4)+'" text-anchor="middle" dominant-baseline="middle" font-size="14" font-weight="700" fill="white" font-family="inherit">'+ch.avatar+'</text></g>';
+    svg+='<text x="'+p.x+'" y="'+(p.y+37)+'" class="rel-label" fill="'+ch.color+'" font-weight="600" font-size="11">'+ch.name+'</text>';
+    svg+='<text x="'+p.x+'" y="'+(p.y+49)+'" class="rel-label" fill="#606878" font-size="10">'+ch.role+'</text>';
+  });
+  svg+='</svg>';
+  var hint=ids.has('c8')?'<div class="rel-center-hint" style="color:#c0392b">⚠️ 嫌疑人已标记：青衣剑客</div>':'<div class="rel-center-hint">💡 收集线索解锁关系图</div>';
+  c.innerHTML=svg+hint;
+}
+
+// ==================== 新增：证据链面板 ====================
+var BOARD_SLOTS=[
+  {label:'受害者身份',icon:'🛡️',slots:[{t:'北境军密使',i:'🛡️',c:'c12'},{t:'携带密函赴约',i:'✉️',c:'c9'},{t:'化名李云入住',i:'📋',c:'c3'}]},
+  {label:'凶手手法',icon:'🗡️',slots:[{t:'软剑穿窗密室',i:'🗡️',c:'c2'},{t:'翻墙逃离现场',i:'🧱',c:'c10'},{t:'官靴脚印',i:'👢',c:'c10'}]},
+  {label:'作案动机',icon:'🔤',slots:[{t:'代号K灭口',i:'🔤',c:'c9'},{t:'阻止军需交接',i:'📜',c:'c12'},{t:'近期三起同类命案',i:'📅',c:'c11'}]},
+  {label:'凶手特征',icon:'⚔️',slots:[{t:'青衣剑客无影刃',i:'⚔️',c:'c8'},{t:'知晓死者军籍身份',i:'🔍',c:'c8'},{t:'精通软剑暗器',i:'🎯',c:'c1'}]}
+];
+function renderBoard(){
+  var c=document.getElementById('boardContainer');
+  if(!c)return;
+  var ids=new Set(GAME.clues);
+  var allSlots=BOARD_SLOTS.flatMap(function(s){return s.slots;});
+  var filled=allSlots.filter(function(s){return ids.has(s.c);}).length;
+  var pct=Math.round(filled/allSlots.length*100);
+  var html='<div class="board-progress"><div class="board-progress-bar"><div class="board-progress-fill" style="width:'+pct+'%"></div></div><div class="board-progress-text">'+filled+'/'+allSlots.length+'</div></div>';
+  if(pct>=66)html+='<div class="board-theorem"><div class="board-theorem-title">🔬 推论</div><div class="board-theorem-text">案件性质：<strong>乾卦K指令的灭口行动</strong><br>凶手特征：<strong>江湖刺客，精通软剑</strong><br>关键：<strong>青衣剑客为何知道死者军籍？</strong></div></div>';
+  BOARD_SLOTS.forEach(function(sec){
+    html+='<div class="board-section-title">'+sec.icon+' '+sec.label+'</div><div class="board-slots">';
+    sec.slots.forEach(function(sl){
+      var f=ids.has(sl.c);
+      html+='<div class="board-slot '+(f?'filled':'locked')+'"><span class="board-slot-icon">'+sl.i+'</span><span>'+(f?sl.t:'??? 线索不足 ???')+'</span>'+(f?'<span class="board-slot-check">✅</span>':'')+'</div>';
+    });
+    html+='</div>';
+  });
+  c.innerHTML=html;
+}
+
+// ==================== 新增：工具面板切换 ====================
+var currentToolPanel='timeline';
+function switchToolPanel(panel){
+  currentToolPanel=panel;
+  document.querySelectorAll('.tool-btn').forEach(function(b){b.classList.toggle('active',b.id==='toolBtn'+panel.charAt(0).toUpperCase()+panel.slice(1));});
+  document.querySelectorAll('.tool-panel').forEach(function(p){p.classList.toggle('active',p.id==='panel'+panel.charAt(0).toUpperCase()+panel.slice(1));});
+  if(panel==='timeline')renderTimeline();
+  if(panel==='relation')renderRelationGraph();
+  if(panel==='log')renderLog();
+  if(panel==='board')renderBoard();
+}
+
+// ==================== 新增：钩子覆写 ====================
+var _oldAddClue=addClue;
+addClue=function(cid){
+  if(GAME.clues.includes(cid))return;
+  var d=CASES[1].clues.find(function(c){return c.id===cid;});
+  if(!d)return;
+  GAME.clues.push(cid);
+  renderClues();
+  showToast('🔍 新线索：'+d.name);
+  renderTimeline();renderRelationGraph();renderBoard();
+  if(GAME.clues.length>=6&&!GAME.flags.deductionUnlocked){
+    GAME.flags.deductionUnlocked=true;
+    showToast('🧠 解锁推理系统！可以开始指认凶手了');
+    var pd=document.getElementById('puzzleDesc');
+    if(pd)pd.textContent='线索已足够，输入凶手身份提交结案';
+  }
+  if(GAME.clues.length>=8)renderLocationList();
+  saveGame();
+};
+var _oldGoScene=goScene;
+goScene=function(key){
+  var sc=CASES[1].scenes[key];
+  if(sc){var plain=sc.text.replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();addLogEntry(sc.title,plain.substr(0,60)+'…','event');renderTimeline();}
+  _oldGoScene(key);
+  renderRelationGraph();
+};
+var _oldTalkTo=talkTo;
+talkTo=function(cid){
+  var ch=CASES[1].characters[cid];
+  if(ch)addLogEntry('与'+ch.name+'交谈','正在询问与案件相关的问题…','interrogation');
+  _oldTalkTo(cid);
+  renderRelationGraph();
+};
+var _oldInitGame=initGame;
+initGame=function(){
+  _oldInitGame();
+  addLogEntry('提刑官抵达清风镇','奉命彻查悦来客栈命案，任重道远。','event');
+  switchToolPanel('timeline');
+  renderTimeline();renderRelationGraph();renderBoard();
+};
 </script>
 </body>
 </html>
