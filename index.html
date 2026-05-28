@@ -2097,13 +2097,20 @@ addClue=function(cid){
   if(GAME.clues.length>=8)renderLocationList();
   saveGame();
 };
-var _oldGoScene=goScene;
-goScene=function(key){
-  var sc=CASES[1].scenes[key];
-  if(sc){var plain=sc.text.replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();addLogEntry(sc.title,plain.substr(0,60)+'…','event');renderTimeline();}
-  _oldGoScene(key);
+
+// goScene 不存在，改为覆写 renderScene 来记录日志
+var _oldRenderScene=renderScene;
+renderScene=function(sceneKey){
+  _oldRenderScene(sceneKey);
+  var sc=CASES[1].scenes[sceneKey];
+  if(sc){
+    var plain=sc.text.replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();
+    addLogEntry(sc.title,plain.substr(0,60)+'…','event');
+    renderTimeline();
+  }
   renderRelationGraph();
 };
+
 var _oldTalkTo=talkTo;
 talkTo=function(cid){
   var ch=CASES[1].characters[cid];
