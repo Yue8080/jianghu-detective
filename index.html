@@ -441,16 +441,16 @@ body {
   background: linear-gradient(135deg, rgba(192,57,43,0.15) 0%, rgba(192,57,43,0.05) 100%);
   border: 1px solid rgba(192,57,43,0.3);
   border-radius: 8px;
-  margin: 12px;
-  padding: 14px 16px;
+  margin: 8px 12px;
+  padding: 10px 12px;
 }
 
 .quest-card .quest-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-  font-size: 13px;
+  gap: 6px;
+  margin-bottom: 6px;
+  font-size: 12px;
   font-weight: 700;
   color: #e74c3c;
 }
@@ -526,21 +526,24 @@ body {
 
 /* 地图/位置面板 */
 .location-list {
-  padding: 8px 12px;
+  padding: 4px 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
 }
 
 .location-item {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
+  gap: 6px;
+  padding: 6px 10px;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 6px;
-  margin-bottom: 6px;
   cursor: pointer;
   transition: all 0.15s;
-  font-size: 13px;
+  font-size: 12px;
+  white-space: nowrap;
 }
 .location-item:hover { border-color: var(--accent-green); }
 .location-item.current { border-color: var(--accent-green); background: rgba(39,174,96,0.08); }
@@ -664,9 +667,10 @@ body {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 4px;
-  padding: 8px 12px;
+  padding: 6px 12px;
   border-bottom: 1px solid var(--border-color);
   background: var(--bg-secondary);
+  flex-shrink: 0;
 }
 
 .tool-btn {
@@ -1127,8 +1131,8 @@ body {
 
   <div class="divider"></div>
   
-  <div style="padding:12px;">
-    <h4 style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">📍 前往地点</h4>
+  <div style="padding:6px 12px;flex-shrink:0;border-top:1px solid var(--border-color);">
+    <h4 style="font-size:10px;color:var(--text-muted);margin-bottom:3px;">📍 前往</h4>
     <div class="location-list" id="locationList">
       <!-- 动态生成 -->
     </div>
@@ -1365,6 +1369,14 @@ const CASES = {
   }
 };
 
+// ==================== 错误捕获 ====================
+window.onerror = function(msg, url, line, col, err) {
+  console.error('JS ERROR:', msg, 'at line', line, ':', col);
+  var el = document.getElementById('tabScene');
+  if(el) el.innerHTML = '<div style="color:red;padding:20px;font-size:14px;">⚠️ 脚本错误: ' + msg + ' (行' + line + ')</div>' + el.innerHTML;
+  return false;
+};
+
 // ==================== 游戏状态管理 ====================
 
 let currentScene = 'inn_opening';
@@ -1451,14 +1463,18 @@ function showClueDetail(clueId) {
   document.querySelectorAll('.clue-item').forEach(el => el.classList.remove('active'));
   if (event && event.currentTarget) event.currentTarget.classList.add('active');
   
-  // 在右侧显示详情
-  document.getElementById('puzzleTitle').textContent = `📋 ${clue.name}`;
-  document.getElementById('puzzleBox').innerHTML = `
-    <div style="font-size:13px;line-height:1.8;color:var(--text-secondary);">${clue.desc}</div>
-    <div style="margin-top:12px;">
-      <span class="clue-tag tag-${clue.tag}">${clue.tagLabel}</span>
-    </div>
-  `;
+  // 在右侧工具区显示详情（使用日志面板作为临时详情展示区）
+  const logPanel = document.getElementById('panelLog');
+  if (logPanel) {
+    logPanel.querySelector('.log-container').innerHTML = `
+      <div style="padding:12px;">
+        <h3 style="margin:0 0 8px;font-size:15px;color:var(--accent-gold);">📋 ${clue.name}</h3>
+        <div style="font-size:13px;line-height:1.8;color:var(--text-secondary);">${clue.desc}</div>
+        <div style="margin-top:10px;"><span class="clue-tag tag-${clue.tag}">${clue.tagLabel}</span></div>
+      </div>`;
+    // 切换到日志面板查看
+    switchToolPanel('log');
+  }
   
   // 移动端：自动切换到右侧面板查看详情
   if (isMobile()) {
@@ -1605,12 +1621,6 @@ function doAction(action) {
       }
       renderScene('deduction_ready');
       renderActions(CASES[1].scenes.deduction_ready.actions);
-      // 设置谜题
-      GAME.puzzleActive = 'final_deduction';
-      document.getElementById('puzzleTitle').textContent = '🧠 最终推理';
-      document.getElementById('puzzleDesc').textContent = CASES[1].puzzles.final_deduction.desc;
-      document.getElementById('puzzleInput').placeholder = '输入凶手名字...';
-      document.getElementById('puzzleHint').innerHTML = '';
       break;
       
     case 'talk_wang':
@@ -2125,6 +2135,8 @@ initGame=function(){
   switchToolPanel('timeline');
   renderTimeline();renderRelationGraph();renderBoard();
 };
+// 启动游戏
+initGame();
 </script>
 </body>
 </html>
